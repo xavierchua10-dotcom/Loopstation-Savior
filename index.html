@@ -84,6 +84,26 @@
     letter-spacing:1px; white-space:nowrap;
   }
 
+  /* ---- phone tip banner: same grid/aspect as desktop & tablet at every
+     size, so on a phone the pads are genuinely small - this nudges
+     people toward a laptop/tablet instead of trying to fake a phone
+     layout. Hidden by default; shown only at phone widths below. ---- */
+  .phone-tip{
+    display:none; align-items:center; justify-content:space-between; gap:12px;
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:14px;
+    padding:10px 12px 10px 14px; margin:0 2px 14px;
+    font-size:11px; line-height:1.45; color:var(--text-dim);
+  }
+  .phone-tip b{ color:var(--text-bright); font-weight:600; }
+  .phone-tip-close{
+    flex-shrink:0; width:22px; height:22px; border-radius:50%;
+    background:transparent; border:1px solid var(--glass-border); color:var(--text-faint);
+    font-size:10px; cursor:pointer; touch-action:manipulation;
+    display:flex; align-items:center; justify-content:center;
+    transition:color 0.15s ease, border-color 0.15s ease;
+  }
+  .phone-tip-close:active{ transform:scale(0.9); }
+
   /* ---- hub launcher icon (direct link to the Savior toolkit) ---- */
   .hub-btn{
     width:34px; height:34px; border-radius:50%; flex-shrink:0;
@@ -347,26 +367,9 @@
     .knob{ width:40px; height:40px; }
     .rhythm-block{ align-items:flex-start; }
     .control-row{ justify-content:flex-start; }
-    .unit{ padding:24px 16px 26px; }
-    /* Give the model-tag its own centered line instead of letting it
-       squeeze awkwardly against the brand group - hub buttons keep
-       their full 34px tap size, nothing shrinks to make room. */
-    .model-tag{ flex:1 0 100%; text-align:center; margin-top:2px; }
   }
-
-  /* ---- mobile pad reflow: 5 pads in one row get too small to tap
-     comfortably on a phone, so below 600px they wrap into a centered
-     3-then-2 layout instead, roughly doubling each pad's size. ---- */
   @media (max-width:600px){
-    .track-rail{
-      display:flex; flex-wrap:wrap; justify-content:center;
-      gap:20px 16px; padding:22px 4px 4px;
-    }
-    .track{ width:calc(33.333% - 11px); max-width:150px; min-width:100px; }
-    .pad-wrap{ max-width:128px; }
-    .track-btns{ max-width:128px; }
-    .tiny-btn{ padding:5px 9px; font-size:9.5px; }
-    .track-label{ font-size:10px; }
+    .phone-tip{ display:flex; }
   }
 
   /* ---- desktop scale-up: same layout, more room to breathe ----
@@ -398,6 +401,11 @@
 </div>
 
 <div class="unit" id="unit">
+
+  <div class="phone-tip" id="phoneTip">
+    <span>Same layout at every size, so pads run small on a phone. <b>Best on a laptop or tablet.</b></span>
+    <div class="phone-tip-close" id="phoneTipClose" role="button" aria-label="Dismiss">&#10005;</div>
+  </div>
 
   <div class="brand-row">
     <div class="brand-group">
@@ -630,6 +638,25 @@ const lcdSub = $('lcdSub');
 const clipLed = $('clipLed');
 const meterEl = $('meter');
 const memLabel = $('memLabel');
+
+/* ============================================================
+   Phone tip banner (dismiss once, remembered via localStorage;
+   works fine standalone even if storage is blocked/unavailable)
+   ============================================================ */
+(function wirePhoneTip() {
+  const tip = $('phoneTip');
+  if (!tip) return;
+  let dismissed = false;
+  try { dismissed = localStorage.getItem('savior505PhoneTipDismissed') === '1'; } catch (e) {}
+  if (dismissed) { tip.style.display = 'none'; return; }
+  const closeBtn = $('phoneTipClose');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      tip.style.display = 'none';
+      try { localStorage.setItem('savior505PhoneTipDismissed', '1'); } catch (e) {}
+    });
+  }
+})();
 
 /* ============================================================
    Build track DOM
