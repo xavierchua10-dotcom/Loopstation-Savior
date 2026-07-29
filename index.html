@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>SAVIOR 505 · Loop Station</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMWMxNjI4Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBhMDcxMCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0idiIgeDE9IjAiIHkxPSIxIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4ZjZiZmYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYzA4NGZjIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNiIgZmlsbD0idXJsKCNnKSIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjE5IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjdikiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtZGFzaGFycmF5PSI5MCAxMjAiIHRyYW5zZm9ybT0icm90YXRlKC05MCAzMiAzMikiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjEzLjQiIHI9IjMuNiIgZmlsbD0iI2MwODRmYyIvPgo8L3N2Zz4=">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --violet:#8f6bff;
+    --violet-2:#c084fc;
+    --violet-dim:rgba(143,107,255,0.18);
+    --violet-glow:rgba(143,107,255,0.5);
+    --led-off:#3a3444;
+    --led-red:#ff5468;
+    --led-green:#3ee68a;
+    --led-amber:#ffb547;
+    --text-bright:#f6f3ff;
+    --text-dim:#a9a0c4;
+    --text-faint:#6e6684;
+    --lcd-text:#7cffb2;
+    --lcd-dim:#3a7a58;
+    --glass:rgba(255,255,255,0.045);
+    --glass-strong:rgba(255,255,255,0.08);
+    --glass-border:rgba(255,255,255,0.09);
+    --radius-lg:28px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0; padding:0; min-height:100vh;
+    background:
+      radial-gradient(circle at 12% -8%, rgba(143,107,255,0.22), transparent 42%),
+      radial-gradient(circle at 105% 15%, rgba(192,132,252,0.10), transparent 38%),
+      radial-gradient(circle at 75% 105%, rgba(124,255,178,0.07), transparent 40%),
+      #07060c;
+    color:var(--text-bright);
+    font-family:'Space Grotesk',sans-serif;
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:22px 14px 70px;
+    padding:max(22px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) calc(70px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+  ::selection{ background:var(--violet-dim); }
+
+  .unit{
+    width:100%; max-width:720px;
+    background:linear-gradient(165deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015));
+    backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-lg);
+    padding:26px 20px 30px;
+    box-shadow:0 50px 90px -35px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
+    position:relative;
+    animation:unitIn 0.5s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes unitIn{ from{ opacity:0; transform:translateY(10px) scale(0.99);} to{ opacity:1; transform:none;} }
+
+  /* ---- header ---- */
+  .brand-row{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    padding:2px 6px 16px; gap:10px; flex-wrap:wrap;
+  }
+  .brand-group{ display:flex; align-items:center; gap:12px; }
+  .brand{ line-height:1; }
+  .brand .wordmark{
+    font-size:27px; font-weight:700; letter-spacing:0.5px;
+    color:var(--text-bright);
+  }
+  .brand .wordmark span{
+    background:linear-gradient(120deg,var(--violet),var(--violet-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .brand .tagline{
+    margin-top:5px; font-size:11px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--text-faint); font-weight:500;
+  }
+  .model-tag{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim);
+    background:var(--glass); border:1px solid var(--glass-border);
+    border-radius:999px; padding:6px 12px;
+    letter-spacing:1px; white-space:nowrap;
+  }
+
+  /* ---- hub launcher icon (direct link to the Savior toolkit) ---- */
+  .hub-btn{
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    background:var(--glass); border:1px solid var(--glass-border);
+    color:var(--text-dim); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; touch-action:manipulation; text-decoration:none;
+    transition:transform 0.12s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    margin-bottom:2px;
+  }
+  .hub-btn:hover{ color:#fff; background:linear-gradient(120deg,var(--violet),#7c4fe0); border-color:transparent; box-shadow:0 6px 18px -4px var(--violet-glow); }
+  .hub-btn:active{ transform:scale(0.9); }
+
+  .hub-overlay{
+    display:none; position:fixed; inset:0; z-index:60;
+    background:rgba(5,4,9,0.82); backdrop-filter:blur(8px);
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .hub-overlay.open{ display:flex; }
+  .hub-panel{
+    width:100%; max-width:340px;
+    background:linear-gradient(165deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    backdrop-filter:blur(24px);
+    border:1px solid var(--glass-border); border-radius:24px; padding:28px 24px 24px;
+    box-shadow:0 50px 90px -30px rgba(0,0,0,0.65);
+    animation:unitIn 0.35s cubic-bezier(.2,.8,.2,1);
+    position:relative; text-align:center;
+  }
+  .hub-close{
+    position:absolute; top:14px; right:14px; width:28px; height:28px; border-radius:50%;
+    background:var(--glass); border:1px solid var(--glass-border); color:var(--text-dim);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px;
+    transition:transform 0.12s ease, color 0.15s ease;
+  }
+  .hub-close:active{ transform:scale(0.9); }
+  .hub-panel .wordmark{ font-size:22px; font-weight:700; letter-spacing:0.5px; }
+  .hub-panel .wordmark span{
+    background:linear-gradient(120deg,var(--violet),var(--violet-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hub-panel .hub-tagline{
+    margin-top:5px; font-size:10.5px; letter-spacing:2.5px; text-transform:uppercase;
+    color:var(--text-faint); font-weight:500;
+  }
+  .hub-panel p.hub-desc{ color:var(--text-dim); font-size:13px; line-height:1.6; margin:14px 0 20px; }
+  .hub-cta{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:13px 18px; border-radius:999px; text-decoration:none;
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px; letter-spacing:0.3px;
+    background:linear-gradient(120deg,var(--violet),#7c4fe0); color:#fff;
+    box-shadow:0 8px 24px -6px var(--violet-glow);
+    transition:transform 0.12s ease;
+  }
+  .hub-cta:active{ transform:scale(0.97); }
+
+  .hub-panel.manual{ max-width:400px; max-height:78vh; overflow-y:auto; text-align:left; }
+  .hub-panel.manual .wordmark{ font-size:20px; }
+  .manual-section{ margin-top:18px; }
+  .manual-section:first-of-type{ margin-top:2px; }
+  .manual-section-label{
+    font-size:10px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--text-faint); font-weight:600; margin-bottom:6px;
+  }
+  .manual-row{ padding:9px 0; border-top:1px solid rgba(255,255,255,0.06); }
+  .manual-row:first-child{ border-top:none; }
+  .manual-row b{ color:var(--text-bright); font-size:12.5px; font-weight:600; }
+  .manual-row span{ display:block; color:var(--text-dim); font-size:11.5px; margin-top:3px; line-height:1.5; }
+
+  .hub-cta-group{ display:flex; flex-direction:column; gap:10px; }
+  .hub-cta.secondary{ background:var(--glass); color:var(--text-bright); box-shadow:none; border:1px solid var(--glass-border); }
+
+  /* ---- LCD ---- */
+  .lcd{
+    background:linear-gradient(160deg, rgba(9,26,17,0.85), rgba(5,14,9,0.9));
+    backdrop-filter:blur(16px);
+    border-radius:20px; padding:14px 18px;
+    border:1px solid rgba(124,255,178,0.14);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,0.05), 0 20px 40px -25px rgba(124,255,178,0.15);
+    font-family:'JetBrains Mono',monospace;
+    display:flex; justify-content:space-between; align-items:center;
+    gap:10px; margin-bottom:16px; flex-wrap:wrap;
+  }
+  .lcd-main{ color:var(--lcd-text); font-size:15px; letter-spacing:1px; text-shadow:0 0 10px rgba(124,255,178,0.45); font-weight:500; }
+  .lcd-sub{ color:var(--lcd-dim); font-size:11px; letter-spacing:1.5px; margin-top:3px; }
+  .lcd-tracks{ display:flex; gap:6px; }
+  .lcd-tracks span{
+    width:17px; height:17px; border-radius:6px; display:flex; align-items:center; justify-content:center;
+    font-size:9px; color:#04150c; background:rgba(124,255,178,0.14); font-weight:700;
+    transition:background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .lcd-tracks span.on{ background:var(--lcd-text); box-shadow:0 0 8px rgba(124,255,178,0.7); }
+  .clip-led{
+    width:9px; height:9px; border-radius:50%; background:rgba(255,84,104,0.15); margin-left:6px;
+    transition:background 0.15s ease, box-shadow 0.15s ease;
+  }
+  .clip-led.on{ background:var(--led-red); box-shadow:0 0 10px var(--led-red); }
+
+  /* ---- control row (knobs + rhythm) ---- */
+  .control-row{
+    display:flex; align-items:flex-start; justify-content:space-between;
+    gap:14px; padding:6px 6px 22px; flex-wrap:wrap;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .knob-cluster{ display:flex; gap:20px; }
+  .knob-unit{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+
+  .knob{
+    width:46px; height:46px; border-radius:50%;
+    position:relative; touch-action:none; cursor:grab;
+  }
+  .knob::before{
+    content:"";
+    position:absolute; inset:0; border-radius:50%;
+    background:conic-gradient(from -135deg,
+      var(--violet) 0deg calc(var(--knob-value, 0) * 270deg),
+      rgba(255,255,255,0.12) calc(var(--knob-value, 0) * 270deg) 270deg,
+      transparent 270deg 360deg);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+            mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+    transition:filter 0.15s ease;
+  }
+  .knob::after{
+    content:"";
+    position:absolute; inset:7px; border-radius:50%;
+    background:linear-gradient(150deg, rgba(255,255,255,0.14), rgba(255,255,255,0.02) 65%);
+    border:1px solid rgba(255,255,255,0.10);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,0.18), inset 0 -3px 8px rgba(0,0,0,0.4);
+    transition:box-shadow 0.15s ease;
+  }
+  .knob.dragging::before{ filter:brightness(1.4); }
+  .knob.dragging::after{ box-shadow:inset 0 1px 1px rgba(255,255,255,0.25), inset 0 -3px 8px rgba(0,0,0,0.4), 0 0 16px var(--violet-glow); }
+  .knob:active{ cursor:grabbing; }
+  .knob .dial-mark{
+    position:absolute; top:4px; left:50%; width:2px; height:11px;
+    background:var(--text-bright); border-radius:2px; transform-origin:1px 19px;
+    box-shadow:0 0 5px var(--violet-glow); z-index:2;
+  }
+  .knob-label{ font-size:9px; letter-spacing:1.5px; color:var(--text-faint); text-transform:uppercase; font-weight:500; }
+
+  .rhythm-block{ display:flex; flex-direction:column; gap:10px; align-items:flex-end; min-width:180px; }
+  .rhythm-top{ display:flex; gap:8px; align-items:center; }
+  .mini-btn{
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:11px; letter-spacing:0.5px;
+    background:var(--glass); color:var(--text-dim); border:1px solid var(--glass-border);
+    border-radius:999px; padding:8px 13px; cursor:pointer; user-select:none; touch-action:manipulation;
+    transition:transform 0.12s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .mini-btn:active{ transform:scale(0.94); }
+  .mini-btn.active{ background:linear-gradient(120deg,var(--violet),#7c4fe0); color:#fff; border-color:transparent; box-shadow:0 4px 16px var(--violet-glow); }
+  .mem-nav{ display:flex; align-items:center; gap:7px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); }
+  .mem-nav button{
+    width:24px; height:24px; border-radius:8px; border:1px solid var(--glass-border); background:var(--glass);
+    color:var(--text-bright); font-size:12px; cursor:pointer; line-height:1;
+    transition:transform 0.12s ease, background 0.15s ease;
+  }
+  .mem-nav button:active{ transform:scale(0.9); }
+  .meter{ display:flex; gap:3px; }
+  .meter-seg{ width:6px; height:11px; border-radius:2px; background:rgba(255,255,255,0.06); transition:background 0.1s ease, box-shadow 0.1s ease; }
+  .meter-seg.g.on{ background:var(--led-green); box-shadow:0 0 5px var(--led-green); }
+  .meter-seg.a.on{ background:var(--led-amber); box-shadow:0 0 5px var(--led-amber); }
+  .meter-seg.r.on{ background:var(--led-red); box-shadow:0 0 5px var(--led-red); }
+
+  /* ---- track rail ---- */
+  .track-rail{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:10px;
+    padding:20px 2px 4px;
+  }
+  .track{ display:flex; flex-direction:column; align-items:center; gap:9px; }
+  .track-knob-row{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .track-knob{ width:34px; height:34px; }
+  .track-knob::after{ inset:5px; }
+  .track-knob .dial-mark{ transform-origin:1px 14px; height:8px; }
+
+  .pad-wrap{ position:relative; width:100%; aspect-ratio:1/1; max-width:96px; touch-action:none; }
+  .pad-ring{ position:absolute; inset:0; transform:rotate(-90deg); }
+  .pad-ring circle.track-bg{ stroke:rgba(255,255,255,0.06); }
+  .pad-ring circle.track-fg{
+    stroke:var(--led-off); stroke-linecap:round;
+    transition:stroke 0.15s ease;
+  }
+  .pad-core{
+    position:absolute; inset:9%; border-radius:50%;
+    background:radial-gradient(circle at 35% 25%, rgba(255,255,255,0.11), rgba(255,255,255,0.015) 65%);
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,0.09);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; cursor:pointer; user-select:none;
+    box-shadow:inset 0 1px 1px rgba(255,255,255,0.08);
+    transition:transform 0.12s ease, box-shadow 0.2s ease;
+  }
+  .pad-core:active{ transform:scale(0.94); }
+  .pad-core .num{ font-size:21px; font-weight:700; color:var(--text-dim); transition:color 0.15s ease; }
+  .pad-core .state{ font-size:8px; letter-spacing:1.5px; color:var(--text-faint); margin-top:2px; text-transform:uppercase; }
+  .pad-wrap.state-rec .pad-core, .pad-wrap.state-armed .pad-core{ box-shadow:inset 0 1px 1px rgba(255,255,255,0.08), 0 0 20px rgba(255,84,104,0.35); }
+  .pad-wrap.state-play .pad-core{ box-shadow:inset 0 1px 1px rgba(255,255,255,0.08), 0 0 18px rgba(62,230,138,0.28); }
+  .pad-wrap.state-overdub .pad-core{ box-shadow:inset 0 1px 1px rgba(255,255,255,0.08), 0 0 20px rgba(255,181,71,0.32); }
+  .pad-wrap.state-armed .pad-core{ animation:armpulse 0.6s ease-in-out infinite; }
+  @keyframes armpulse{ 0%,100%{opacity:1;} 50%{opacity:0.55;} }
+  .pad-wrap.state-rec .num{ color:var(--led-red); }
+  .pad-wrap.state-play .num{ color:var(--led-green); }
+  .pad-wrap.state-overdub .num{ color:var(--led-amber); }
+  .pad-wrap.state-stopped .num{ color:var(--text-dim); }
+
+  .track-label{ font-size:9px; letter-spacing:1.5px; color:var(--text-faint); text-transform:uppercase; font-weight:500; }
+
+  .track-btns{ display:flex; gap:4px; flex-wrap:wrap; justify-content:center; max-width:96px; }
+  .tiny-btn{
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:8.5px; letter-spacing:0.5px;
+    background:var(--glass); color:var(--text-faint); border:1px solid var(--glass-border);
+    border-radius:999px; padding:4px 7px; cursor:pointer; touch-action:manipulation;
+    transition:transform 0.12s ease, background 0.15s ease, color 0.15s ease;
+  }
+  .tiny-btn:active{ transform:scale(0.92); }
+  .tiny-btn.active{ background:linear-gradient(120deg,var(--violet),#7c4fe0); color:#fff; border-color:transparent; }
+  .tiny-btn.mute-active{ background:rgba(255,181,71,0.16); color:var(--led-amber); border-color:rgba(255,181,71,0.35); }
+
+  /* ---- transport ---- */
+  .transport-row{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    padding:22px 4px 6px; flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12px; letter-spacing:0.5px;
+    padding:12px 20px; border-radius:999px; cursor:pointer;
+    border:1px solid var(--glass-border); background:var(--glass); color:var(--text-bright);
+    touch-action:manipulation;
+    transition:transform 0.12s ease, background 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:active{ transform:scale(0.96); }
+  .btn-primary{ background:linear-gradient(120deg,var(--violet),#7c4fe0); border-color:transparent; color:#fff; box-shadow:0 8px 24px -6px var(--violet-glow); }
+  .btn-danger-hold{ color:var(--led-red); border-color:rgba(255,84,104,0.25); }
+
+  /* ---- legend / footer ---- */
+  .legend{
+    display:flex; justify-content:center; gap:18px; flex-wrap:wrap;
+    padding:18px 4px 2px; font-size:10.5px; letter-spacing:0.3px; color:var(--text-faint);
+  }
+  .legend b{ color:var(--text-dim); font-weight:600; }
+  footer{ text-align:center; font-size:10.5px; color:var(--text-faint); padding-top:16px; line-height:1.7; }
+  footer a{ color:var(--text-dim); }
+
+  .veil{
+    position:fixed; inset:0; background:rgba(5,4,9,0.88); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .veil-card{
+    background:linear-gradient(165deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    backdrop-filter:blur(20px);
+    border:1px solid var(--glass-border); border-radius:24px; padding:30px 26px;
+    max-width:340px; text-align:center;
+    box-shadow:0 40px 80px -30px rgba(0,0,0,0.6);
+    animation:unitIn 0.4s cubic-bezier(.2,.8,.2,1);
+  }
+  .veil-card .wordmark{ font-size:23px; font-weight:700; letter-spacing:0.5px; margin-bottom:12px; }
+  .veil-card .wordmark span{
+    background:linear-gradient(120deg,var(--violet),var(--violet-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .veil-card p{ color:var(--text-dim); font-size:13px; line-height:1.65; }
+
+  @media (max-width:420px){
+    .knob{ width:40px; height:40px; }
+    .rhythm-block{ align-items:flex-start; }
+    .control-row{ justify-content:flex-start; }
+    .unit{ padding:24px 16px 26px; }
+    /* Give the model-tag its own centered line instead of letting it
+       squeeze awkwardly against the brand group - hub buttons keep
+       their full 34px tap size, nothing shrinks to make room. */
+    .model-tag{ flex:1 0 100%; text-align:center; margin-top:2px; }
+  }
+
+  /* ---- mobile pad reflow: 5 pads in one row get too small to tap
+     comfortably on a phone, so below 600px they wrap into a centered
+     3-then-2 layout instead, roughly doubling each pad's size. ---- */
+  @media (max-width:600px){
+    .track-rail{
+      display:flex; flex-wrap:wrap; justify-content:center;
+      gap:20px 16px; padding:22px 4px 4px;
+    }
+    .track{ width:calc(33.333% - 11px); max-width:150px; min-width:100px; }
+    .pad-wrap{ max-width:128px; }
+    .track-btns{ max-width:128px; }
+    .tiny-btn{ padding:5px 9px; font-size:9.5px; }
+    .track-label{ font-size:10px; }
+  }
+
+  /* ---- desktop scale-up: same layout, more room to breathe ----
+     Mobile rules above are untouched; these only widen the console
+     and let the pads grow into the extra space on bigger screens. */
+  @media (min-width:900px){
+    .unit{ max-width:960px; padding:34px 34px 40px; }
+    .track-rail{ gap:18px; padding:26px 4px 6px; }
+    .pad-wrap{ max-width:132px; }
+    .track-btns{ max-width:132px; }
+    .lcd{ padding:16px 22px; }
+  }
+  @media (min-width:1400px){
+    .unit{ max-width:1120px; }
+    .pad-wrap{ max-width:152px; }
+    .track-btns{ max-width:152px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="veil" id="startVeil">
+  <div class="veil-card">
+    <div class="wordmark">SAVIOR <span>505</span></div>
+    <p>Needs mic access to record loops. Mic is tuned for music &mdash; echo cancellation, noise suppression and auto‑gain are switched off so your low end stays intact.<br><br>Use headphones to avoid feedback.</p>
+    <button class="btn btn-primary" id="startBtn" style="margin-top:14px;">Enable Mic &amp; Start</button>
+    <p id="startError" style="display:none; color:var(--led-red); font-size:12px; margin-top:14px; line-height:1.6; text-align:left;"></p>
+  </div>
+</div>
+
+<div class="unit" id="unit">
+
+  <div class="brand-row">
+    <div class="brand-group">
+      <div class="brand">
+        <div class="wordmark">SAVIOR <span>505</span></div>
+        <div class="tagline">Loop Station</div>
+      </div>
+      <button class="hub-btn" id="hubBtn" aria-label="Open the Savior toolkit" title="Open the Savior toolkit">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <rect x="3" y="3" width="7" height="7" rx="1.6"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="1.6"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="1.6"></rect>
+          <rect x="14" y="14" width="7" height="7" rx="1.6"></rect>
+        </svg>
+      </button>
+      <button class="hub-btn" id="manualBtn" aria-label="Open the manual" title="How to use this">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 5c2-1 5-1 7 0v14c-2-1-5-1-7 0V5z"></path>
+          <path d="M20 5c-2-1-5-1-7 0v14c2-1 5-1 7 0V5z"></path>
+        </svg>
+      </button>
+      <button class="hub-btn" id="bugBtn" aria-label="Report a bug" title="Report a bug">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="7" y="7" width="10" height="12" rx="5"></rect>
+          <path d="M9 7V5M15 7V5M4 10h3M20 10h-3M4 15h3M20 15h-3M9 19l-2 2M15 19l2 2"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="model-tag">5‑TRACK &middot; SYNC ENGINE</div>
+  </div>
+
+  <div class="hub-overlay" id="hubOverlay">
+    <div class="hub-panel">
+      <div class="hub-close" id="hubClose">&#10005;</div>
+      <div class="wordmark">SAVIOR</div>
+      <div class="hub-tagline">Beatbox Audio Tools</div>
+      <p class="hub-desc">You're about to leave the loop station for the main Savior toolkit page.</p>
+      <a class="hub-cta" href="https://xavierchua10-dotcom.github.io/savior-hub/" target="_blank" rel="noopener">Open the Full Toolkit &#8599;</a>
+    </div>
+  </div>
+
+  <div class="hub-overlay" id="manualOverlay">
+    <div class="hub-panel manual">
+      <div class="hub-close" id="manualClose">&#10005;</div>
+      <div class="wordmark">Manual</div>
+      <div class="hub-tagline">Savior 505 Loop Station</div>
+
+      <div class="manual-section">
+        <div class="manual-section-label">Tracks</div>
+        <div class="manual-row"><b>Tap a pad</b><span>Cycles rec &rarr; play &rarr; overdub. The first track you record sets the loop length &mdash; every other track auto-syncs to it.</span></div>
+        <div class="manual-row"><b>MUTE button</b><span>Silences or resumes that track without losing what's recorded.</span></div>
+        <div class="manual-row"><b>Hold a pad</b><span>Clears that track for a fresh recording.</span></div>
+      </div>
+
+      <div class="manual-section">
+        <div class="manual-section-label">Track FX</div>
+        <div class="manual-row"><b>REV</b><span>Reverses the track's audio, swapped in cleanly at the next loop boundary.</span></div>
+        <div class="manual-row"><b>CRUSH</b><span>Sends the track through a lo-fi filter + bitcrush effect.</span></div>
+      </div>
+
+      <div class="manual-section">
+        <div class="manual-section-label">Knobs</div>
+        <div class="manual-row"><b>Monitor</b><span>How much of your live mic you hear back. Off by default &mdash; turn up carefully, and use headphones to avoid feedback.</span></div>
+        <div class="manual-row"><b>Master</b><span>Overall output volume.</span></div>
+        <div class="manual-row"><b>Space</b><span>Reverb amount on the master mix.</span></div>
+        <div class="manual-row"><b>Small knob per track</b><span>That track's individual level.</span></div>
+      </div>
+
+      <div class="manual-section">
+        <div class="manual-section-label">Rhythm &amp; Tempo</div>
+        <div class="manual-row"><b>RHYTHM</b><span>Toggles a metronome click guide, independent of your loops.</span></div>
+        <div class="manual-row"><b>TAP</b><span>Tap a few times in tempo to set the BPM.</span></div>
+      </div>
+
+      <div class="manual-section">
+        <div class="manual-section-label">Memory</div>
+        <div class="manual-row"><b>Save Mem / Load Mem</b><span>Stores or recalls all 5 tracks and their settings in one of 4 slots. Use the &#9664; &#9654; arrows to pick a slot.</span></div>
+        <div class="manual-row"><b>Session only</b><span>Memory slots reset when the page reloads &mdash; they don't save to disk.</span></div>
+      </div>
+
+      <div class="manual-section">
+        <div class="manual-section-label">Transport</div>
+        <div class="manual-row"><b>Play All</b><span>Pauses or resumes every track together, in sync.</span></div>
+        <div class="manual-row"><b>Hold: New Loop</b><span>Clears everything and starts a fresh loop from scratch.</span></div>
+      </div>
+
+      <div class="manual-section">
+        <div class="manual-section-label">Tips</div>
+        <div class="manual-row"><b>New tracks sound blended with old ones?</b><span>That's the mic picking up earlier tracks playing out of your speaker while you record &mdash; not a bug. Wear headphones and it clears right up, since the mic then only hears you.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hub-overlay" id="bugOverlay">
+    <div class="hub-panel">
+      <div class="hub-close" id="bugClose">&#10005;</div>
+      <div class="wordmark">Report a Bug</div>
+      <div class="hub-tagline">Found something broken?</div>
+      <p class="hub-desc">Let me know what happened &mdash; which track, button, or browser &mdash; and I'll take a look.</p>
+      <div class="hub-cta-group">
+        <a class="hub-cta" href="https://instagram.com/im.savior_" target="_blank" rel="noopener">Message @im.savior_ &#8599;</a>
+        <a class="hub-cta secondary" href="mailto:xavierchua10@gmail.com?subject=Savior%20505%20Bug%20Report" target="_blank" rel="noopener">Email xavierchua10@gmail.com</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="lcd">
+    <div>
+      <div class="lcd-main" id="lcdMain">P01 &nbsp; &mdash;&mdash; BPM</div>
+      <div class="lcd-sub" id="lcdSub">EMPTY &middot; TAP A PAD TO START</div>
+    </div>
+    <div style="display:flex; align-items:center;">
+      <div class="lcd-tracks" id="lcdTracks">
+        <span id="lcdT0">1</span><span id="lcdT1">2</span><span id="lcdT2">3</span><span id="lcdT3">4</span><span id="lcdT4">5</span>
+      </div>
+      <div class="clip-led" id="clipLed"></div>
+    </div>
+  </div>
+
+  <div class="control-row">
+    <div class="knob-cluster">
+      <div class="knob-unit">
+        <div class="knob" id="knobInput"><div class="dial-mark"></div></div>
+        <div class="knob-label">Monitor</div>
+      </div>
+      <div class="knob-unit">
+        <div class="knob" id="knobMaster"><div class="dial-mark"></div></div>
+        <div class="knob-label">Master</div>
+      </div>
+      <div class="knob-unit">
+        <div class="knob" id="knobSpace"><div class="dial-mark"></div></div>
+        <div class="knob-label">Space</div>
+      </div>
+    </div>
+    <div class="rhythm-block">
+      <div class="rhythm-top">
+        <div class="mini-btn" id="btnRhythm">RHYTHM</div>
+        <div class="mini-btn" id="btnTap">TAP</div>
+        <div class="mem-nav">
+          <button id="memPrev">&#9664;</button>
+          <span id="memLabel">MEM 01</span>
+          <button id="memNext">&#9654;</button>
+        </div>
+      </div>
+      <div class="meter" id="meter"></div>
+    </div>
+  </div>
+
+  <div class="track-rail" id="trackRail"><!-- populated by JS --></div>
+
+  <div class="legend">
+    <span><b>TAP</b> rec &rarr; play &rarr; overdub</span>
+    <span><b>MUTE</b> btn silences / resumes</span>
+    <span><b>HOLD</b> pad to clear</span>
+  </div>
+
+  <div class="transport-row">
+    <div class="btn btn-primary" id="btnPlayAll">&#9654; Play All</div>
+    <div class="btn" id="btnSave">Save Mem</div>
+    <div class="btn" id="btnLoad">Load Mem</div>
+    <div class="btn btn-danger-hold" id="btnReset">Hold: New Loop</div>
+  </div>
+
+  <footer>
+    Session memory only &mdash; slots reset on reload. Built for phone &amp; desktop browsers.<br>
+    Inspired by the <a href="https://articles.boss.info/the-complete-guide-to-loop-pedals-for-multi-instrumentalists-and-performers/" target="_blank" rel="noopener">Boss RC‑505mkII</a>, reworked for the Savior rig.
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const NUM_TRACKS = 5;
+const LONGPRESS_MS = 600;
+const DOUBLETAP_MS = 300;
+const MEM_SLOTS = 4;
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let ctx = null;
+let micStream = null;
+let micSource = null;
+let recorderNode = null;
+let masterBus, masterGain, dryGain, reverbConv, reverbWet, inputMonitorGain, analyserNode, timeDomainBuf;
+
+let masterLoopLength = null;   // seconds, null = no loop defined yet
+let loopPhaseAnchor = null;    // ctx.currentTime reference: phase = (now - anchor) mod length
+let transportPlaying = false;  // master play/stop (mute-all) state
+let activeRecordingTrack = null; // index of track currently arming/recording/overdubbing, or null
+let clipHoldFrames = 0;
+
+// Recorder capture state (single shared recorder - only one track ever
+// captures at a time). armed/recording/actualStartFrame/stopAtCount are
+// all in absolute sample-frame terms (ctx.currentTime * ctx.sampleRate).
+const recState = {
+  armed: false,
+  recording: false,
+  targetFrame: 0,
+  actualStartFrame: 0,
+  stopAtCount: null, // null = open-ended, capture until stopRecordingNow()
+  chunksL: [],
+  chunksR: [],
+  captured: 0
+};
+
+let bpm = 120;
+let rhythmOn = false;
+let tapTimes = [];
+let nextClickTime = 0;
+let schedulerTimer = null;
+const LOOKAHEAD = 0.1; // seconds
+
+let memSlots = new Array(MEM_SLOTS).fill(null);
+let memIndex = 0;
+
+const tracks = []; // filled in initTracks()
+
+/* ============================================================
+   DOM refs
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+const trackRail = $('trackRail');
+const lcdMain = $('lcdMain');
+const lcdSub = $('lcdSub');
+const clipLed = $('clipLed');
+const meterEl = $('meter');
+const memLabel = $('memLabel');
+
+/* ============================================================
+   Build track DOM
+   ============================================================ */
+const RING_R = 42;
+const RING_C = 2 * Math.PI * RING_R;
+
+for (let i = 0; i < NUM_TRACKS; i++) {
+  const wrap = document.createElement('div');
+  wrap.className = 'track';
+  wrap.innerHTML = `
+    <div class="track-knob-row">
+      <div class="knob track-knob" data-track="${i}" id="trackKnob${i}"><div class="dial-mark"></div></div>
+    </div>
+    <div class="pad-wrap state-empty" id="padWrap${i}">
+      <svg class="pad-ring" viewBox="0 0 100 100">
+        <circle class="track-bg" cx="50" cy="50" r="${RING_R}" fill="none" stroke-width="5"></circle>
+        <circle class="track-fg" id="ring${i}" cx="50" cy="50" r="${RING_R}" fill="none" stroke-width="5"
+          stroke-dasharray="${RING_C}" stroke-dashoffset="${RING_C}"></circle>
+      </svg>
+      <div class="pad-core" id="pad${i}">
+        <div class="num">${i + 1}</div>
+        <div class="state" id="padState${i}">empty</div>
+      </div>
+    </div>
+    <div class="track-label">Track ${i + 1}</div>
+    <div class="track-btns">
+      <div class="tiny-btn" id="revBtn${i}">REV</div>
+      <div class="tiny-btn" id="fxBtn${i}">CRUSH</div>
+      <div class="tiny-btn" id="muteBtn${i}">MUTE</div>
+    </div>
+  `;
+  trackRail.appendChild(wrap);
+}
+
+// build meter segments (10)
+for (let i = 0; i < 10; i++) {
+  const seg = document.createElement('div');
+  seg.className = 'meter-seg ' + (i < 6 ? 'g' : (i < 8 ? 'a' : 'r'));
+  seg.dataset.idx = i;
+  meterEl.appendChild(seg);
+}
+
+/* ============================================================
+   Audio init (must happen on user gesture)
+   ============================================================ */
+async function startAudio() {
+  ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+  micStream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      echoCancellation: false,
+      noiseSuppression: false,
+      autoGainControl: false,
+      channelCount: 2
+    }
+  });
+  micSource = ctx.createMediaStreamSource(micStream);
+
+  // ---- master bus ----
+  masterBus = ctx.createGain();
+  masterBus.gain.value = 1;
+
+  masterGain = ctx.createGain();
+  masterGain.gain.value = 0.85;
+
+  dryGain = ctx.createGain();
+  dryGain.gain.value = 1;
+
+  reverbWet = ctx.createGain();
+  reverbWet.gain.value = 0;
+
+  reverbConv = ctx.createConvolver();
+  reverbConv.buffer = buildImpulse(2.2, 2.6);
+
+  analyserNode = ctx.createAnalyser();
+  analyserNode.fftSize = 1024;
+  timeDomainBuf = new Float32Array(analyserNode.fftSize);
+
+  masterBus.connect(dryGain);
+  masterBus.connect(reverbConv);
+  reverbConv.connect(reverbWet);
+  dryGain.connect(masterGain);
+  reverbWet.connect(masterGain);
+  masterGain.connect(analyserNode);
+  analyserNode.connect(ctx.destination);
+
+  // input monitor (mic straight to master, off by default)
+  inputMonitorGain = ctx.createGain();
+  inputMonitorGain.gain.value = 0;
+  micSource.connect(inputMonitorGain);
+  inputMonitorGain.connect(masterBus);
+
+  // ---- recorder ----
+  // ScriptProcessorNode is deprecated but needs no module/CSP dance like
+  // AudioWorklet does - far more portable across hosts and browsers.
+  // Precision is recovered by slicing each callback's buffer down to the
+  // exact sample where a target frame falls, rather than relying on the
+  // callback firing at a precise moment.
+  const REC_BUFFER_SIZE = 1024;
+  recorderNode = ctx.createScriptProcessor(REC_BUFFER_SIZE, 2, 2);
+  const recorderSink = ctx.createGain();
+  recorderSink.gain.value = 0; // silent - just keeps the node's processing graph alive
+  micSource.connect(recorderNode);
+  recorderNode.connect(recorderSink);
+  recorderSink.connect(ctx.destination);
+  recorderNode.onaudioprocess = handleRecorderProcess;
+
+  initTracks();
+  wireKnobs();
+  wireTrackButtons();
+  wireTransport();
+  wireRhythm();
+  wireMemory();
+  requestAnimationFrame(renderLoop);
+  startScheduler();
+}
+
+function buildImpulse(seconds, decay) {
+  const rate = ctx.sampleRate;
+  const len = Math.floor(rate * seconds);
+  const buf = ctx.createBuffer(2, len, rate);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = buf.getChannelData(ch);
+    for (let i = 0; i < len; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+    }
+  }
+  return buf;
+}
+
+/* ============================================================
+   Track model
+   ============================================================ */
+function initTracks() {
+  for (let i = 0; i < NUM_TRACKS; i++) {
+    const gainNode = ctx.createGain(); gainNode.gain.value = 0.85;
+    const fxIn = ctx.createGain(); fxIn.gain.value = 1;       // dry path
+    const fxWet = ctx.createGain(); fxWet.gain.value = 0;     // crush path
+    const filt = ctx.createBiquadFilter(); filt.type = 'lowpass'; filt.frequency.value = 2200; filt.Q.value = 0.7;
+    const shaper = ctx.createWaveShaper(); shaper.curve = buildCrushCurve(); shaper.oversample = 'none';
+    const outGain = ctx.createGain(); outGain.gain.value = 1;
+
+    gainNode.connect(fxIn);
+    gainNode.connect(filt);
+    filt.connect(shaper);
+    shaper.connect(fxWet);
+    fxIn.connect(outGain);
+    fxWet.connect(outGain);
+    outGain.connect(masterBus);
+
+    tracks.push({
+      id: i,
+      state: 'EMPTY', // EMPTY, ARMED, RECORDING, PLAYING, OVERDUBBING, STOPPED
+      buffer: null,
+      reversedBuffer: null,
+      reversed: false,
+      fx: false,
+      level: 0.85,
+      source: null,
+      gainNode, fxIn, fxWet, filt, shaper, outGain,
+      isDefiningCapture: false,
+      longPressTimer: null,
+      suppressClick: false
+    });
+  }
+}
+
+function buildCrushCurve() {
+  const n = 256;
+  const curve = new Float32Array(n);
+  const steps = 10; // bit-crush-ish stair stepping
+  for (let i = 0; i < n; i++) {
+    const x = (i / (n - 1)) * 2 - 1;
+    curve[i] = Math.round(x * steps) / steps;
+  }
+  return curve;
+}
+
+/* ============================================================
+   Boundary / timing helpers
+   ============================================================ */
+function nextBoundaryTime(lookaheadMin = 0.09) {
+  if (masterLoopLength === null || loopPhaseAnchor === null) return ctx.currentTime + lookaheadMin;
+  const now = ctx.currentTime;
+  let n = Math.ceil((now - loopPhaseAnchor) / masterLoopLength);
+  let t = loopPhaseAnchor + n * masterLoopLength;
+  if (t < now + lookaheadMin) t += masterLoopLength;
+  return t;
+}
+
+function currentPhase() {
+  if (masterLoopLength === null || loopPhaseAnchor === null) return 0;
+  let p = (ctx.currentTime - loopPhaseAnchor) % masterLoopLength;
+  if (p < 0) p += masterLoopLength;
+  return p;
+}
+
+function cloneBuffer(buf) {
+  const out = ctx.createBuffer(buf.numberOfChannels, buf.length, buf.sampleRate);
+  for (let c = 0; c < buf.numberOfChannels; c++) {
+    out.copyToChannel(buf.getChannelData(c).slice(), c);
+  }
+  return out;
+}
+
+function reverseBuffer(buf) {
+  const out = ctx.createBuffer(buf.numberOfChannels, buf.length, buf.sampleRate);
+  for (let c = 0; c < buf.numberOfChannels; c++) {
+    const src = buf.getChannelData(c);
+    const dst = out.getChannelData(c);
+    for (let i = 0; i < src.length; i++) dst[i] = src[src.length - 1 - i];
+  }
+  return out;
+}
+
+/* ============================================================
+   Playback control
+   ============================================================ */
+function bufferFor(track) {
+  if (track.reversed) {
+    if (!track.reversedBuffer) track.reversedBuffer = reverseBuffer(track.buffer);
+    return track.reversedBuffer;
+  }
+  return track.buffer;
+}
+
+function startTrackSource(track, atTime, offset) {
+  if (!track.buffer) return;
+  const src = ctx.createBufferSource();
+  src.buffer = bufferFor(track);
+  src.loop = true;
+  src.loopStart = 0;
+  src.loopEnd = track.buffer.duration;
+  src.connect(track.gainNode);
+  src.start(atTime, offset);
+  track.source = src;
+}
+
+function stopTrackSource(track, atTime) {
+  if (track.source) {
+    try { track.source.stop(atTime === undefined ? ctx.currentTime : atTime); } catch (e) {}
+    track.source = null;
+  }
+}
+
+function invalidateReversedCache(track) {
+  track.reversedBuffer = null;
+}
+
+/* ============================================================
+   Recorder capture (ScriptProcessorNode callback, main thread)
+   ============================================================ */
+function armRecording(targetFrame, numSamples) {
+  recState.armed = true;
+  recState.recording = false;
+  recState.targetFrame = targetFrame;
+  recState.stopAtCount = numSamples;
+  recState.chunksL = [];
+  recState.chunksR = [];
+  recState.captured = 0;
+}
+
+function cancelRecording() {
+  recState.armed = false;
+  recState.recording = false;
+  recState.chunksL = [];
+  recState.chunksR = [];
+  recState.captured = 0;
+}
+
+function stopRecordingNow() {
+  if (!recState.recording) { recState.armed = false; return; }
+  // cut at "now", converted to a sample count relative to when capture actually began
+  const nowFrame = Math.round(ctx.currentTime * ctx.sampleRate);
+  recState.stopAtCount = Math.max(1, nowFrame - recState.actualStartFrame);
+  // the next onaudioprocess callback will see captured >= stopAtCount (or trim to it) and finish
+}
+
+function handleRecorderProcess(e) {
+  if (!recState.armed && !recState.recording) return;
+  const inBuf = e.inputBuffer;
+  const inL = inBuf.getChannelData(0);
+  const inR = inBuf.numberOfChannels > 1 ? inBuf.getChannelData(1) : inL;
+  const n = inL.length;
+  const startFrame = Math.round(e.playbackTime * ctx.sampleRate);
+
+  let i = 0;
+  if (!recState.recording) {
+    if (recState.targetFrame >= startFrame + n) return; // boundary not reached yet
+    i = Math.max(0, recState.targetFrame - startFrame);
+    recState.recording = true;
+    recState.actualStartFrame = startFrame + i;
+  }
+
+  let end = n;
+  if (recState.stopAtCount !== null) {
+    const remaining = recState.stopAtCount - recState.captured;
+    if (remaining <= end - i) end = i + Math.max(0, remaining);
+  }
+
+  if (end > i) {
+    recState.chunksL.push(inL.slice(i, end));
+    recState.chunksR.push(inR.slice(i, end));
+    recState.captured += (end - i);
+  }
+
+  if (recState.stopAtCount !== null && recState.captured >= recState.stopAtCount) {
+    finishRecording();
+  }
+}
+
+function finishRecording() {
+  const total = recState.captured;
+  const left = new Float32Array(total);
+  const right = new Float32Array(total);
+  let off = 0;
+  for (let k = 0; k < recState.chunksL.length; k++) {
+    left.set(recState.chunksL[k], off);
+    right.set(recState.chunksR[k], off);
+    off += recState.chunksL[k].length;
+  }
+  recState.armed = false;
+  recState.recording = false;
+  recState.chunksL = [];
+  recState.chunksR = [];
+  recState.captured = 0;
+
+  applyRecordedBuffer(left, right);
+}
+
+function applyRecordedBuffer(left, right) {
+  const track = tracks[activeRecordingTrack];
+  if (!track) return;
+
+  const newBuf = ctx.createBuffer(2, left.length, ctx.sampleRate);
+  newBuf.copyToChannel(left, 0);
+  newBuf.copyToChannel(right, 1);
+
+  if (track.isDefiningCapture) {
+    // this recording establishes the master loop length + phase reference for every other track
+    track.buffer = newBuf;
+    invalidateReversedCache(track);
+    masterLoopLength = newBuf.duration;
+    loopPhaseAnchor = ctx.currentTime;
+    track.state = 'PLAYING';
+    track.isDefiningCapture = false;
+    startTrackSource(track, ctx.currentTime, 0);
+  } else if (track.state === 'OVERDUBBING') {
+    // mix new pass into existing buffer, soft-clip to avoid harsh peaks
+    const a = track.buffer.getChannelData(0), b = track.buffer.getChannelData(1);
+    const nl = newBuf.getChannelData(0), nr = newBuf.getChannelData(1);
+    for (let i = 0; i < a.length && i < nl.length; i++) {
+      a[i] = Math.tanh(a[i] + nl[i]);
+      b[i] = Math.tanh(b[i] + nr[i]);
+    }
+    invalidateReversedCache(track);
+    track.state = 'PLAYING';
+    // resync playback to current phase for tightness
+    stopTrackSource(track, ctx.currentTime);
+    startTrackSource(track, ctx.currentTime, currentPhase());
+  } else {
+    // this track's first-ever capture, quantized to an already-established loop:
+    // buffer index 0 corresponds to loop phase 0, so start into the buffer at the current phase
+    track.buffer = newBuf;
+    invalidateReversedCache(track);
+    track.state = 'PLAYING';
+    startTrackSource(track, ctx.currentTime, currentPhase());
+  }
+
+  activeRecordingTrack = null;
+  updateLcd();
+}
+
+/* ============================================================
+   Track tap state machine
+   ============================================================ */
+function armOrRecord(i) {
+  const track = tracks[i];
+  if (activeRecordingTrack !== null && activeRecordingTrack !== i) return; // busy elsewhere
+
+  if (track.state === 'EMPTY') {
+    if (masterLoopLength === null) {
+      // open-ended: this capture defines the loop length for everything after it
+      activeRecordingTrack = i;
+      track.isDefiningCapture = true;
+      track.state = 'RECORDING';
+      armRecording(Math.round(ctx.currentTime * ctx.sampleRate), null);
+    } else {
+      // synced single-pass capture, quantized to the existing loop - does NOT redefine timing
+      const t = nextBoundaryTime();
+      const targetFrame = Math.round(t * ctx.sampleRate);
+      const numSamples = Math.round(masterLoopLength * ctx.sampleRate);
+      activeRecordingTrack = i;
+      track.isDefiningCapture = false;
+      track.state = 'ARMED';
+      armRecording(targetFrame, numSamples);
+      // flip to RECORDING label once boundary passes
+      const delayMs = Math.max(0, (t - ctx.currentTime) * 1000);
+      setTimeout(() => { if (track.state === 'ARMED') track.state = 'RECORDING'; }, delayMs);
+    }
+  } else if (track.state === 'RECORDING' && track.isDefiningCapture) {
+    // stop the loop-defining recording
+    stopRecordingNow();
+  } else if (track.state === 'PLAYING') {
+    const t = nextBoundaryTime();
+    const targetFrame = Math.round(t * ctx.sampleRate);
+    const numSamples = Math.round(masterLoopLength * ctx.sampleRate);
+    activeRecordingTrack = i;
+    track.isDefiningCapture = false;
+    track.state = 'ARMED';
+    armRecording(targetFrame, numSamples);
+    const delayMs = Math.max(0, (t - ctx.currentTime) * 1000);
+    setTimeout(() => { if (track.state === 'ARMED') track.state = 'OVERDUBBING'; }, delayMs);
+  } else if (track.state === 'ARMED') {
+    // cancel arm
+    cancelRecording();
+    track.state = track.buffer ? 'PLAYING' : 'EMPTY';
+    activeRecordingTrack = null;
+  } else if (track.state === 'STOPPED') {
+    toggleMute(i); // tapping a muted pad resumes it
+  }
+  updateLcd();
+}
+
+function toggleMute(i) {
+  const track = tracks[i];
+  if (!track.buffer) return;
+  if (track.state === 'PLAYING' || track.state === 'OVERDUBBING') {
+    stopTrackSource(track, ctx.currentTime);
+    track.state = 'STOPPED';
+  } else if (track.state === 'STOPPED') {
+    startTrackSource(track, ctx.currentTime, currentPhase());
+    track.state = 'PLAYING';
+  }
+  updateMuteUI(i);
+  updateLcd();
+}
+
+function updateMuteUI(i) {
+  $('muteBtn' + i).classList.toggle('mute-active', tracks[i].state === 'STOPPED');
+}
+
+function clearTrack(i) {
+  const track = tracks[i];
+  if (track.state === 'RECORDING' || track.state === 'ARMED' || track.state === 'OVERDUBBING') return;
+  stopTrackSource(track, ctx.currentTime);
+  track.buffer = null;
+  track.reversedBuffer = null;
+  track.reversed = false;
+  track.fx = false;
+  track.state = 'EMPTY';
+  updateFxUI(i);
+  updateMuteUI(i);
+  const anyContent = tracks.some(t => t.buffer !== null);
+  if (!anyContent) { masterLoopLength = null; loopPhaseAnchor = null; }
+  updateLcd();
+}
+
+/* ============================================================
+   Pad interaction (tap / double-tap / long-press)
+   ============================================================ */
+function wireTrackButtons() {
+  tracks.forEach((track, i) => {
+    const pad = $('pad' + i);
+    const rev = $('revBtn' + i);
+    const fx = $('fxBtn' + i);
+
+    pad.addEventListener('pointerdown', (ev) => {
+      ev.preventDefault();
+      track.suppressClick = false;
+      track.longPressTimer = setTimeout(() => {
+        track.suppressClick = true;
+        clearTrack(i);
+      }, LONGPRESS_MS);
+    });
+
+    pad.addEventListener('pointerup', (ev) => {
+      ev.preventDefault();
+      clearTimeout(track.longPressTimer);
+      if (track.suppressClick) return;
+      armOrRecord(i); // fires immediately - timing matters when you're playing live
+    });
+
+    pad.addEventListener('pointerleave', () => clearTimeout(track.longPressTimer));
+
+    $('muteBtn' + i).addEventListener('click', () => toggleMute(i));
+
+    rev.addEventListener('click', () => {
+      if (!track.buffer) return;
+      track.reversed = !track.reversed;
+      rev.classList.toggle('active', track.reversed);
+      if (track.state === 'PLAYING' || track.state === 'OVERDUBBING' || track.state === 'STOPPED') {
+        const t = nextBoundaryTime(0.02);
+        const oldSrc = track.source;
+        if (track.state !== 'STOPPED') {
+          startTrackSource(track, t, 0);
+          if (oldSrc) { try { oldSrc.stop(t); } catch (e) {} }
+        }
+      }
+    });
+
+    fx.addEventListener('click', () => {
+      track.fx = !track.fx;
+      updateFxUI(i);
+      const now = ctx.currentTime;
+      track.fxIn.gain.setTargetAtTime(track.fx ? 0 : 1, now, 0.015);
+      track.fxWet.gain.setTargetAtTime(track.fx ? 1 : 0, now, 0.015);
+    });
+  });
+}
+
+function updateFxUI(i) {
+  $('fxBtn' + i).classList.toggle('active', tracks[i].fx);
+  $('revBtn' + i).classList.toggle('active', tracks[i].reversed);
+}
+
+/* ============================================================
+   Knobs (level per track + input/master/space)
+   ============================================================ */
+function makeKnob(el, opts) {
+  let dragging = false, startY = 0, startVal = opts.value;
+  const mark = el.querySelector('.dial-mark');
+  function paint(v) {
+    const norm = (v - opts.min) / (opts.max - opts.min);
+    const deg = -135 + norm * 270;
+    mark.style.transform = `rotate(${deg}deg)`;
+    el.style.setProperty('--knob-value', norm);
+  }
+  paint(opts.value);
+  el.addEventListener('pointerdown', (e) => {
+    dragging = true; startY = e.clientY; startVal = opts.value;
+    el.classList.add('dragging');
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const delta = (startY - e.clientY) / 160;
+    let v = startVal + delta * (opts.max - opts.min);
+    v = Math.max(opts.min, Math.min(opts.max, v));
+    opts.value = v;
+    paint(v);
+    opts.onChange(v);
+  });
+  ['pointerup', 'pointercancel'].forEach(evt => el.addEventListener(evt, () => { dragging = false; el.classList.remove('dragging'); }));
+
+  // external API so code outside the drag closure (e.g. loading a memory
+  // slot) can push a new value in and have the dial + internal state agree,
+  // instead of the knob silently drifting out of sync with the real gain.
+  return {
+    setValue(v) {
+      v = Math.max(opts.min, Math.min(opts.max, v));
+      opts.value = v;
+      startVal = v;
+      paint(v);
+    }
+  };
+}
+
+function wireKnobs() {
+  makeKnob($('knobInput'), {
+    min: 0, max: 1, value: 0,
+    onChange: (v) => inputMonitorGain.gain.setTargetAtTime(v, ctx.currentTime, 0.02)
+  });
+  makeKnob($('knobMaster'), {
+    min: 0, max: 1.2, value: 0.85,
+    onChange: (v) => masterGain.gain.setTargetAtTime(v, ctx.currentTime, 0.02)
+  });
+  makeKnob($('knobSpace'), {
+    min: 0, max: 1, value: 0,
+    onChange: (v) => reverbWet.gain.setTargetAtTime(v, ctx.currentTime, 0.02)
+  });
+  tracks.forEach((track, i) => {
+    track.knobApi = makeKnob($('trackKnob' + i), {
+      min: 0, max: 1.2, value: 0.85,
+      onChange: (v) => { track.level = v; track.gainNode.gain.setTargetAtTime(v, ctx.currentTime, 0.02); }
+    });
+  });
+}
+
+/* ============================================================
+   Master transport
+   ============================================================ */
+function wireTransport() {
+  const playAll = $('btnPlayAll');
+  playAll.addEventListener('click', () => {
+    if (masterLoopLength === null) return;
+    transportPlaying = !transportPlaying;
+    const phase = currentPhase();
+    tracks.forEach(track => {
+      if (!track.buffer) return;
+      if (transportPlaying) {
+        if (track.state === 'STOPPED') { startTrackSource(track, ctx.currentTime, phase); track.state = 'PLAYING'; }
+      } else {
+        if (track.state === 'PLAYING' || track.state === 'OVERDUBBING') { stopTrackSource(track, ctx.currentTime); track.state = 'STOPPED'; }
+      }
+    });
+    playAll.textContent = transportPlaying ? '\u25B6 Play All' : '\u23F8 Paused';
+    updateLcd();
+  });
+
+  let resetTimer = null;
+  const resetBtn = $('btnReset');
+  resetBtn.addEventListener('pointerdown', () => {
+    resetTimer = setTimeout(() => {
+      tracks.forEach((t, i) => clearTrack(i));
+      transportPlaying = false;
+      playAll.textContent = '\u25B6 Play All';
+    }, LONGPRESS_MS);
+  });
+  ['pointerup', 'pointerleave'].forEach(evt => resetBtn.addEventListener(evt, () => clearTimeout(resetTimer)));
+
+  $('btnSave').addEventListener('click', saveMemory);
+}
+
+/* ============================================================
+   Rhythm / metronome (free-running guide, lookahead scheduler)
+   ============================================================ */
+function wireRhythm() {
+  $('btnRhythm').addEventListener('click', () => {
+    rhythmOn = !rhythmOn;
+    $('btnRhythm').classList.toggle('active', rhythmOn);
+    if (rhythmOn) nextClickTime = ctx.currentTime + 0.05;
+  });
+  $('btnTap').addEventListener('click', () => {
+    const now = performance.now();
+    tapTimes.push(now);
+    if (tapTimes.length > 5) tapTimes.shift();
+    if (tapTimes.length >= 2) {
+      let intervals = [];
+      for (let i = 1; i < tapTimes.length; i++) intervals.push(tapTimes[i] - tapTimes[i - 1]);
+      const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      bpm = Math.max(40, Math.min(240, Math.round(60000 / avg)));
+    }
+    setTimeout(() => { if (Date.now() - (tapTimes[tapTimes.length - 1] + performance.timing.navigationStart) > 2000) tapTimes = []; }, 2100);
+  });
+}
+
+let beatCount = 0;
+function startScheduler() {
+  schedulerTimer = setInterval(() => {
+    if (!rhythmOn || !ctx) return;
+    while (nextClickTime < ctx.currentTime + LOOKAHEAD) {
+      playClick(nextClickTime, beatCount % 4 === 0);
+      nextClickTime += 60 / bpm;
+      beatCount++;
+    }
+  }, 25);
+}
+
+function playClick(time, accent) {
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.frequency.value = accent ? 1500 : 900;
+  g.gain.setValueAtTime(0.0001, time);
+  g.gain.linearRampToValueAtTime(accent ? 0.35 : 0.2, time + 0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
+  osc.connect(g); g.connect(masterBus);
+  osc.start(time); osc.stop(time + 0.06);
+}
+
+/* ============================================================
+   Memory (session-only, 4 slots)
+   ============================================================ */
+function wireMemory() {
+  $('memPrev').addEventListener('click', () => { memIndex = (memIndex - 1 + MEM_SLOTS) % MEM_SLOTS; renderMemLabel(); });
+  $('memNext').addEventListener('click', () => { memIndex = (memIndex + 1) % MEM_SLOTS; renderMemLabel(); });
+  renderMemLabel();
+}
+function renderMemLabel() {
+  const has = memSlots[memIndex] ? '' : ' (empty)';
+  memLabel.textContent = 'MEM ' + String(memIndex + 1).padStart(2, '0') + has;
+}
+function saveMemory() {
+  const snap = {
+    masterLoopLength, bpm,
+    tracks: tracks.map(t => ({
+      buffer: t.buffer ? cloneBuffer(t.buffer) : null,
+      level: t.level, reversed: t.reversed, fx: t.fx
+    }))
+  };
+  memSlots[memIndex] = snap;
+  renderMemLabel();
+  flashLcd('SAVED TO MEM ' + String(memIndex + 1).padStart(2, '0'));
+}
+function loadMemory() {
+  const snap = memSlots[memIndex];
+  if (!snap) { flashLcd('MEM SLOT EMPTY'); return; }
+  tracks.forEach((t) => { stopTrackSource(t, ctx.currentTime); });
+  masterLoopLength = snap.masterLoopLength;
+  loopPhaseAnchor = masterLoopLength ? ctx.currentTime : null;
+  bpm = snap.bpm;
+  snap.tracks.forEach((s, i) => {
+    const t = tracks[i];
+    t.buffer = s.buffer;
+    t.reversedBuffer = null;
+    t.reversed = s.reversed;
+    t.fx = s.fx;
+    t.level = s.level;
+    t.gainNode.gain.value = s.level;
+    if (t.knobApi) t.knobApi.setValue(s.level);
+    updateFxUI(i);
+    t.fxIn.gain.value = t.fx ? 0 : 1;
+    t.fxWet.gain.value = t.fx ? 1 : 0;
+    if (t.buffer) { startTrackSource(t, ctx.currentTime, 0); t.state = 'PLAYING'; }
+    else t.state = 'EMPTY';
+    updateMuteUI(i);
+  });
+  transportPlaying = true;
+  flashLcd('LOADED MEM ' + String(memIndex + 1).padStart(2, '0'));
+}
+$('btnLoad').addEventListener('click', loadMemory);
+memLabel.style.cursor = 'pointer';
+memLabel.addEventListener('click', loadMemory);
+
+let lcdFlashTimer = null;
+function flashLcd(msg) {
+  lcdSub.textContent = msg;
+  clearTimeout(lcdFlashTimer);
+  lcdFlashTimer = setTimeout(updateLcd, 1400);
+}
+
+/* ============================================================
+   UI render loop
+   ============================================================ */
+const STATE_LABEL = { EMPTY: 'empty', ARMED: 'wait', RECORDING: 'rec', PLAYING: 'play', OVERDUBBING: 'dub', STOPPED: 'muted' };
+const STATE_CLASS = { EMPTY: 'state-empty', ARMED: 'state-armed', RECORDING: 'state-rec', PLAYING: 'state-play', OVERDUBBING: 'state-overdub', STOPPED: 'state-stopped' };
+
+function updateLcd() {
+  const bpmStr = String(bpm).padStart(3, '0');
+  lcdMain.textContent = 'P' + String(memIndex + 1).padStart(2, '0') + '   ' + bpmStr + ' BPM';
+  if (!lcdFlashTimer) {
+    const anyBusy = tracks.some(t => t.state === 'ARMED' || t.state === 'RECORDING');
+    if (masterLoopLength === null) lcdSub.textContent = 'EMPTY \u00B7 TAP A PAD TO START';
+    else if (anyBusy) lcdSub.textContent = 'SYNCING TO LOOP\u2026';
+    else lcdSub.textContent = (masterLoopLength.toFixed(2)) + 's LOOP \u00B7 ' + (transportPlaying ? 'RUNNING' : 'STOPPED');
+  }
+  for (let i = 0; i < NUM_TRACKS; i++) {
+    const t = tracks[i];
+    $('lcdT' + i).classList.toggle('on', t.buffer !== null && t.state !== 'STOPPED');
+  }
+}
+
+function renderLoop() {
+  if (ctx) {
+    for (let i = 0; i < NUM_TRACKS; i++) {
+      const t = tracks[i];
+      const wrap = $('padWrap' + i);
+      const ring = $('ring' + i);
+      const stateEl = $('padState' + i);
+      wrap.className = 'pad-wrap ' + STATE_CLASS[t.state];
+      stateEl.textContent = STATE_LABEL[t.state];
+
+      let color = 'var(--led-off)';
+      let frac = 0;
+      if (t.state === 'RECORDING') { color = 'var(--led-red)'; frac = masterLoopLength ? (currentPhase() / masterLoopLength) : 0.5; }
+      else if (t.state === 'ARMED') { color = 'var(--led-red)'; frac = 1; }
+      else if (t.state === 'PLAYING') { color = 'var(--led-green)'; frac = masterLoopLength ? (currentPhase() / masterLoopLength) : 0; }
+      else if (t.state === 'OVERDUBBING') { color = 'var(--led-amber)'; frac = masterLoopLength ? (currentPhase() / masterLoopLength) : 0; }
+      else if (t.state === 'STOPPED') { color = 'var(--led-green)'; frac = masterLoopLength ? (currentPhase() / masterLoopLength) : 0; ring.style.opacity = 0.4; }
+      if (t.state !== 'STOPPED') ring.style.opacity = 1;
+
+      ring.style.stroke = color;
+      ring.style.strokeDashoffset = RING_C * (1 - frac);
+    }
+
+    // meter
+    analyserNode.getFloatTimeDomainData(timeDomainBuf);
+    let sum = 0, peak = 0;
+    for (let i = 0; i < timeDomainBuf.length; i++) { const v = timeDomainBuf[i]; sum += v * v; if (Math.abs(v) > peak) peak = Math.abs(v); }
+    const rms = Math.sqrt(sum / timeDomainBuf.length);
+    const lit = Math.min(10, Math.round(rms * 34));
+    const segs = meterEl.children;
+    for (let i = 0; i < segs.length; i++) segs[i].classList.toggle('on', i < lit);
+
+    if (peak > 0.98) clipHoldFrames = 20;
+    if (clipHoldFrames > 0) { clipLed.classList.add('on'); clipHoldFrames--; } else clipLed.classList.remove('on');
+
+    updateLcd();
+  }
+  requestAnimationFrame(renderLoop);
+}
+
+/* ============================================================
+   Boot
+   ============================================================ */
+/* ============================================================
+   Overlay panels (toolkit link + manual) - open on tap so
+   nothing navigates or covers the UI by accident; both work
+   independent of audio engine state
+   ============================================================ */
+function wireModal(btnId, overlayId, closeId) {
+  const btn = $(btnId), overlay = $(overlayId), closeBtn = $(closeId);
+  btn.addEventListener('click', () => overlay.classList.add('open'));
+  const close = () => overlay.classList.remove('open');
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+}
+wireModal('hubBtn', 'hubOverlay', 'hubClose');
+wireModal('manualBtn', 'manualOverlay', 'manualClose');
+wireModal('bugBtn', 'bugOverlay', 'bugClose');
+
+$('startBtn').addEventListener('click', async () => {
+  const errEl = $('startError');
+  const showError = (msg) => {
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+  };
+  errEl.style.display = 'none';
+
+  // Mic access requires a secure top-level context (https, or localhost).
+  // Opening this file directly (file://) or viewing it inside a sandboxed
+  // in-app preview will silently fail these checks in most browsers.
+  if (window.isSecureContext === false) {
+    showError('This page isn\u2019t running in a secure context, so the browser won\u2019t grant mic access. Open it over https:// (e.g. deployed on GitHub Pages / Netlify) or via http://localhost \u2014 not by double\u2011clicking the file, and not inside an in\u2011chat preview.');
+    return;
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showError('This browser (or the frame this page is running in) doesn\u2019t expose microphone access. Try opening the downloaded file directly in a full browser tab, or host it on GitHub Pages / Netlify like your other tools.');
+    return;
+  }
+
+  try {
+    await startAudio();
+    $('startVeil').style.display = 'none';
+  } catch (err) {
+    showError('Could not access the microphone: ' + err.message + '. Check that mic permission wasn\u2019t denied for this site in your browser settings, then reload.');
+  }
+});
+
+})();
+</script>
+</body>
+</html>
