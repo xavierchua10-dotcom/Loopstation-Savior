@@ -370,6 +370,19 @@
   }
   @media (max-width:600px){
     .phone-tip{ display:flex; }
+
+    /* Bigger, easier-to-tap pads on phone: wrap the 5 tracks into a
+       centered 3-then-2 layout instead of squeezing them all into
+       one row. Roughly doubles each pad's touch target. */
+    .track-rail{
+      display:flex; flex-wrap:wrap; justify-content:center;
+      gap:20px 16px; padding:22px 4px 4px;
+    }
+    .track{ width:calc(33.333% - 11px); max-width:150px; min-width:100px; }
+    .pad-wrap{ max-width:128px; }
+    .track-btns{ max-width:128px; }
+    .tiny-btn{ padding:5px 9px; font-size:9.5px; }
+    .track-label{ font-size:10px; }
   }
 
   /* ---- desktop scale-up: same layout, more room to breathe ----
